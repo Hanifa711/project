@@ -1,7 +1,7 @@
 # IR Project
 
 ## Description
-A search engin that can be applied to two data sets which are (Clinical Trials) and (COVID) with UI using Flutter platform.
+A search engine that can be applied to two data sets (Clinical Trials) and (COVID) with UI using Flutter platform.
 
 ## Table of Contents
 - [Installation](#installation)
@@ -33,7 +33,7 @@ To run the project, follow these steps:
     ```sh
     http://localhost:8000
     ```
-3. Run the flutter project for easier experiance
+3. Run the flutter project for easier experience(check the Flutter brunch).
     
 ## Features:
 
