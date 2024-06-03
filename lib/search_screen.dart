@@ -22,6 +22,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
+    //SharedPreferencesHelper.clearList();
     _searchController.addListener(_onSearchChanged);
   }
 
@@ -54,6 +55,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _performSearch(BuildContext context) async{
+       _searchResults.clear();
        await myController.getSearchResult(datasetNumber: datasetNumber,query: _searchController.text);
        await myController.getCorrectedQuery(query: _searchController.text);
        myController.correctedQuery.isNotEmpty? await SharedPreferencesHelper.addItemToList(_searchController.text): null;
@@ -157,6 +159,8 @@ showAlertDialog(context) {
                 Column(children: [
                    TextButton(onPressed: (){
                     setState(() {
+                      _searchSuggestions.clear();
+                      _searchController.clear();
                       datasetNumber=1;
                       datasetOne=true;
         
@@ -165,6 +169,8 @@ showAlertDialog(context) {
                     SizedBox(height: 10,),
                    TextButton(onPressed: (){
                     setState(() {
+                      _searchSuggestions.clear();
+                      _searchController.clear();
                       datasetNumber=2;
                       datasetOne=false;
                     });
