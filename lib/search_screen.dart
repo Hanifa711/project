@@ -58,7 +58,7 @@ class _SearchScreenState extends State<SearchScreen> {
        _searchResults.clear();
        await myController.getSearchResult(datasetNumber: datasetNumber,query: _searchController.text);
        await myController.getCorrectedQuery(query: _searchController.text);
-       myController.correctedQuery.isNotEmpty? await SharedPreferencesHelper.addItemToList(_searchController.text): null;
+       myController.correctedQuery.isEmpty? null:await SharedPreferencesHelper.addItemToList(myController.correctedQuery);
     setState(() {
       _searchResults = myController.result;
       docIds=_searchResults.keys.toList();

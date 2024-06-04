@@ -19,7 +19,7 @@ class SharedPreferencesHelper {
   static Future<void> addItemToList(String item) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> currentList = prefs.getStringList(_key) ?? [];
-    if (!currentList.contains(item) && (!Controller.query1.contains(item) && !Controller.query2.contains(item))) {
+    if (!currentList.contains(item) && !Controller.query1.contains(item) && !Controller.query2.contains(item)) {
       currentList.add(item);
       await prefs.setStringList(_key, currentList);
     }
