@@ -6,16 +6,18 @@ from data_set2.data_set2_dict import data2_dict
 from data_set2.qrel2_mini import qrel2_list_mini
 from data_set2.qrel2_list import qrel2_list
 from data_set2.query2_dict import query2_dict
+from itertools import islice
+
 
 with open('vectorizer_obj2.pkl', 'rb') as file: 
              vectorizer = pickle.load(file) 
 with open('tfidf_matrix2.pkl', 'rb') as file: 
              tfidf_matrix = pickle.load(file)
-with open('kmeans_model2.pkl', 'rb') as file: 
+with open('kmeans_model.pkl', 'rb') as file: 
              kmeans = pickle.load(file)  
              kmeans=kmeans.fit(tfidf_matrix)   
 
-def find_relevant_documents(query,query_id,vectorizer=vectorizer, kmeans=kmeans, tfidf_matrix=tfidf_matrix, data_dict=data2_dict,similarity_threshold=0.2):
+def find_relevant_documents(query,query_id,vectorizer=vectorizer, kmeans=kmeans, tfidf_matrix=tfidf_matrix, data_dict=data2_dict,similarity_threshold=0.02):
         # Step 1: Transform the query using the vectorizer
         query_vector = vectorizer.transform([query])
         
@@ -42,6 +44,35 @@ def find_relevant_documents(query,query_id,vectorizer=vectorizer, kmeans=kmeans,
         sorted_documents = sorted(filtered_documents.items(), key=lambda item: item[1], reverse=True)        
         return sorted_documents    
 
+def match_collect_clus(query):
+        data_dict=data2_dict
+        similarity_threshold=0.02
+        query_vector = vectorizer.transform([query])
+        
+        query_cluster = kmeans.predict(query_vector)[0]
+        # print("query_cluster : ",query_cluster)
+        cluster_indices = [i for i, label in enumerate(kmeans.labels_) if label == query_cluster]
+
+        doc_ids = list(data_dict.keys())
+        index_to_doc_id = {i: doc_ids[i] for i in cluster_indices}    
+        
+        cluster_documents = {index_to_doc_id[idx]: data_dict[index_to_doc_id[idx]] for idx in cluster_indices}
+        cluster_tfidf_matrix = tfidf_matrix[cluster_indices]
+        # print("cluster_tfidf_matrix",cluster_tfidf_matrix)
+        # Step 4: Calculate cosine similarity between the query and the documents in the cluster
+        similarity_matrix = cosine_similarity(query_vector, cluster_tfidf_matrix)
+        
+        # Step 5: Filter and sort documents based on similarity threshold
+        doc_ids = list(cluster_documents.keys())
+        document_ranking = dict(zip(doc_ids, similarity_matrix.flatten()))
+        filtered_documents = {key: value for key, value in document_ranking.items() if value >= similarity_threshold}
+        sorted_documents = sorted(filtered_documents.items(), key=lambda item: item[1], reverse=True)        
+        keys_from_sorted_dict = {key for key, _ in sorted_documents}
+        result_dict = {key: data_dict[key] for key in keys_from_sorted_dict if key in data_dict}
+        first_10_items = dict(islice(result_dict.items(), 10))
+        return first_10_items 
+  
+
  
 # reacll_avg=0               
 # for key,value in query2_dict.items():
@@ -65,7 +96,8 @@ def calc_MAP_cluster() :
         query_retrived_list=[]
         query_precision_list=[]
         real_relevant=myqrel_list.get(key)
-        for i in range(len(sorted_dict)):
+
+        for i in range(10):
             if sorted_dict[i][0] in real_relevant:
                query_retrived_list.append(1)
                query_precision_list.append(len(query_retrived_list)/(i+1))
@@ -172,5 +204,5 @@ def  calc_avg():
      avg = 0 
      for key,value in query2_dict.items(): 
            avg+=check_correct_cluster(id=key,query=value) 
-     return round((avg/len(query2_dict)),2)*100     
+     return round((avg/len(query2_dict))*100 ,2)    
 

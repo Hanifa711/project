@@ -20,8 +20,8 @@ class TextProcessor:
         self.specific_words = set(self.specific_words)
         self.stop_words = set(stopwords.words('english'))
         self.punctuation = set(string.punctuation)
-       # self.lemmatizer = WordNetLemmatizer()
-        self.stemmer = PorterStemmer()
+        self.lemmatizer = WordNetLemmatizer()
+        #self.stemmer = PorterStemmer()
         self.normalize = Normalization()
         nltk.download('stopwords')
         # Combine multiple regex patterns into one for RegexpTokenizer
@@ -42,29 +42,47 @@ class TextProcessor:
         # Tokenize the text using RegexpTokenizer
         words = self.tokenizer.tokenize(text)
         
-        # Remove stopwords and specific words
-        filtered_words = [
-            word for word in words 
-            if word.lower() not in self.stop_words 
-            and word.lower() not in self.specific_words
-        ]
+        filtered_words = list(set([
+        word for word in words 
+        if word.lower() not in self.stop_words 
+        and word.lower() not in self.specific_words
+        and word not in self.punctuation
+        ]))
 
-        # Remove punctuation
-        filtered_words = [word for word in filtered_words if word not in self.punctuation]
 
-        # Apply normalization
-        normalized_words = [self.normalize.normalize(word) for word in filtered_words]
+        normalized_words = list(set([self.normalize.normalize(word) for word in filtered_words]))
         #print(normalized_words[0])
-        # POS tagging
         pos_tags = pos_tag(normalized_words)
 
         #print(pos_tags[0])
-        # Apply stemming
-        # lemmatized_words = [self.lemmatizer.lemmatize(word,pos=self.get_wordnet_pos(tag)) for word, tag in pos_tags]
-        stemmed_words = [self.stemmer.stem(word) for word in normalized_words]
+        lemmatized_words = [self.lemmatizer.lemmatize(word,pos=self.get_wordnet_pos(tag)) for word, tag in pos_tags]
+        #stemmed_words = [self.stemmer.stem(word) for word in normalized_words]
 
         #return lemmatized_words
-        return ' '.join(stemmed_words)
+        return ' '.join(lemmatized_words)
+    
+
+    def process_single_text(self, text):
+        # Tokenize the text using RegexpTokenizer
+        words = self.tokenizer.tokenize(text)
+        
+        filtered_words = list(set([
+        word for word in words 
+        if word.lower() not in self.stop_words 
+        and word.lower() not in self.specific_words
+        and word not in self.punctuation
+        ]))
+
+
+        normalized_words = list(set([self.normalize.normalize(word) for word in filtered_words]))
+        #print(normalized_words[0])
+        pos_tags = pos_tag(normalized_words)
+
+        #print(pos_tags[0])
+        lemmatized_words = [self.lemmatizer.lemmatize(word,pos=self.get_wordnet_pos(tag)) for word, tag in pos_tags]
+        #stemmed_words = [self.stemmer.stem(word) for word in normalized_words]
+
+        return lemmatized_words
     
 
     # def process(self):

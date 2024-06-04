@@ -2,7 +2,7 @@ from itertools import islice
 import pickle
 import nltk
 from nltk.corpus import stopwords
-from query_processing import QueryProcessor
+# from query_processing import QueryProcessor
 from data_set1.data_set1_dict import data1_dict
 from data_set2.data_set2_dict import data2_dict
 from sklearn.metrics.pairwise import cosine_similarity 
@@ -42,17 +42,9 @@ def match_collect_data(query,dataset_number):
     # Get the first 10 items (if there are that many)
     first_10_items = dict(islice(result_dict.items(), 10))
     # print(first_10_items.keys())
-    return first_10_items
+    return first_10_items 
 
-    # return  list(sorted_dict.items())[:10]
 
-    #  # Get the top 10 most similar documents
-    # top_10_indices = np.argsort(similarity_matrix[0])[::-1][:10]  # Sort in descending order and take top 10
-
-    # # Retrieve and print the top 10 similarities and their indices
-    # top_10_similarities = similarity_matrix[0][top_10_indices]
-    # for index, similarity in zip(top_10_indices, top_10_similarities):
-    #     print(f"Document index: {index}, Similarity: {similarity:.4f}")       
 def match_data(query,dataset_number):
     data_dict={}
 

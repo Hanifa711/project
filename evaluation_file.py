@@ -204,6 +204,31 @@ def calc_Recall(query,id,dataset_number):
 
     return round(relvant/total_relvent,2)
 
-# for key,value in query2_dict.items():
-#     calc_Recall(dataset_number=2,id=key,query=value)       
+
+def calc_avg_recall(dataset_number):
+     total=0
+     avg=0
+     myquery={}
+     if dataset_number==1:
+         myquery=query_dict
+     elif dataset_number==2:
+         myquery=query2_dict    
+     for key,value in myquery.items():
+        total+=1
+        avg+=calc_Recall(query=value,id=key,dataset_number=dataset_number)
+     return round(avg/total,2)
+
+def calc_avg_precision(dataset_number):
+     total=0
+     avg=0
+     myquery={}
+     if dataset_number==1:
+         myquery=query_dict
+     elif dataset_number==2:
+         myquery=query2_dict    
+     for key,value in myquery.items():
+        total+=1
+        avg+=calc_precision(query=value,id=key,dataset_number=dataset_number)
+     return round(avg/total,2)
+
 

@@ -7,10 +7,10 @@ from nltk.corpus import stopwords
 from fastapi import FastAPI, File, UploadFile,Form
 from text_processing import TextProcessor
 from evaluation_file import calc_MAP,calc_MRR,calc_avg_precision,calc_avg_recall
-from calc_cluster import calc_avg_precision_cluster,calc_avg_reacll_cluster,calc_MRR_cluster,calc_MAP_cluster,calc_avg
+from calc_cluster import match_collect_clus,calc_avg_precision_cluster,calc_avg_reacll_cluster,calc_MRR_cluster,calc_MAP_cluster,calc_avg
 from fastapi.responses import PlainTextResponse
 from indexing_data import indexing_data
-from matching import match_data
+from matching import match_collect_data
 from suggest_query import suggest_corrected_query
 from fastapi.middleware.cors import CORSMiddleware
 class TextInput(BaseModel):
@@ -40,7 +40,7 @@ def read_root():
 @app.get("/text_processing/")
 def text_processing(input_data: TextInput):
     processor = TextProcessor()
-    clean_txt = processor.process_text(text=input_data.text)
+    clean_txt = processor.process_single_text(text=input_data.text)
     return {"proceesed_txt" : clean_txt}
 
 
@@ -105,7 +105,11 @@ def indixing_data_endpoint(input_data: TextInput):
 @app.post("/matching/{dataset_number}")
 def matching_data_endpoint(input_data: TextInput,dataset_number:int):
    try:
-        value = match_data(input_data.text, dataset_number)
+        if dataset_number== 1 :
+            value = match_collect_data(input_data.text, dataset_number)
+        elif dataset_number==2:
+            value = match_collect_clus(input_data.text)
+
         
         # Check if result_dict is empty
         if not value:
@@ -138,8 +142,8 @@ def kMean_avg_endpoint():
     value_with_percentage = f"{value}%"
     return {"Result:" : value_with_percentage}
 
-@app.get("/correct/{dataset_number}")
+@app.post("/correct")
 def correct_query_endpoint(input_data: TextInput):
     value=suggest_corrected_query(input_data.text)
-    return {"Result:" : value}
+    return {"Result" : value}
 
